@@ -2,6 +2,13 @@
 import math
 import sys
 
+
+"""
+This code refers to the url:
+https://github.com/palloc/1D-CNN-Library/blob/master/libDL.py
+"""
+
+
 # learning rate
 epsilon = 0.5
 
@@ -84,6 +91,53 @@ def Max_Pool_Func(x, kernel_size):
         next_node.append(max_temp)
         counter += kernel_size
     return next_node
+
+# Pass fully conected layer
+def Pass_FC(old_layer, new_layer, w):
+    new_layer.bp_node = old_layer.node
+    old_layer.node.append(1)
+    new_layer.node = FullyConnected_Func(old_layer.node, w)
+    new_layer.Do_Logistic()
+
+# Pass convolution layer
+def Pass_Conv(old_layer, new_layer, w):
+    new_layer.bp_node = old_layer.node
+    old_layer.node.append(1)
+    new_layer.node = Conv_Func(old_layer.node, w)
+    new_layer.Do_Logistic()
+
+# Pass max pooling layer
+def Pass_Max_Pool(old_layer, new_layer, kernel_size):
+    new_layer.node = Max_Pool_Func(old_layer.node, kernel_size)
+
+# Pass fully connected layer
+def Pass_FC_Out(old_layer, new_layer, w):
+    old_layer.node.append(1)
+    new_layer.node = FullyConnected_Func(old_layer.node, w)
+    new_layer.Do_Softmax()
+
+
+"""
+---------------------------------
+  Function for back-propagation
+---------------------------------
+"""
+
+# Differential logistic function
+def Dif_Logistic_Func(x):
+    new_node = []
+    for i in x:
+        new_node.append(Logistic_Func(i) * (1 - Logistic_Func(i)))
+    return new_node
+
+# Calculate cross entropy
+def Cross_Entropy(x, d):
+    result = []
+    for i in range(len(x)):
+        result.append(x[i] - d[i])
+    return result
+
+
 
 
 def main():
